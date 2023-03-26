@@ -42,6 +42,6 @@ if __name__ == "__main__":
         #changes[url].append(current_time)
         changes[url][current_time] = {"md5": md5_res.hexdigest(), "sha256": sha256_res.hexdigest()}
 
-        # writing the data back in the file
-        with open(os.path.join(os.path.dirname(__file__), "output", "changes_db.json"), "w+") as open_file:
-            changes = json.dump(changes, open_file, indent=4)
+    # writing the data back in the file
+    with open(os.path.join(os.path.dirname(__file__), "output", "changes_db.json"), "w+") as open_file:
+        changes = json.dump(changes, open_file, indent=4)
