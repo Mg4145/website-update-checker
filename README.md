@@ -4,7 +4,7 @@ Simple script that take an url and make an md5 an sha256 out of it. Check if it 
 
 ## Little problems
 
-some website change everytime => take only the body?
+some website change everytime (google for exemple) => take only the body?
 
 ## to implement
 
