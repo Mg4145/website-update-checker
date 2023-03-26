@@ -29,6 +29,8 @@ if __name__ == "__main__":
         changes = json.load(readable)
 
     for url in valid_urls:
+        if url.endswith("/"):
+            url = url[:-1]
         # request url
         content = urlopen(url=url).read()
 
