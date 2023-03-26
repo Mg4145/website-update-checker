@@ -7,8 +7,9 @@ from urllib.request import urlopen
 from urllib.parse import urlparse
 import argparse
 import webbrowser
+import configparser
 
-from src.funct import change_since_last_time
+from src.funct import change_since_last_time, file_path
 
 
 REGEX_FOR_URL = re.compile(
@@ -25,13 +26,28 @@ START_PROGRAM_TIME = time.time()
 DB_FILEPATH = os.path.join(os.path.dirname(__file__), "output", "changes_db.json")
 
 if __name__ == "__main__":
+    # Argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument("url", nargs='+', help="List of url to analyse. Wrong urls will be ignored.")
-    parser.add_argument("-o","--open_url", default=False, action="store_true", help="List of url to analyse. Wrong urls will be ignored.")
+    parser.add_argument("-u","--url_list", nargs='+',default=[], help="List of url to analyse. Wrong urls will be ignored.")
+    parser.add_argument("-o","--open_url", default=False, action="store_true", help="Boolean, if true it opens the url in your preferred webbrowser")
+    parser.add_argument("-f","--file", nargs=1, type=file_path, help="Specifies a path to a file with a list of browsers in it.")
     args = parser.parse_args()
-    print(args)
-    valid_urls = [an_url for an_url in args.url if all([getattr(urlparse(an_url), qualifying_attr) for qualifying_attr in ('scheme', 'netloc')])]
+    urls_from_file = []
+    if args.file is not None:
+        config = configparser.ConfigParser()
+        config.read(args.file[0])
+        # we catch the different tags
+        tags = config.sections()
+        #for now we just extract every url
 
+        for a_tag in config.sections():
+            for a_nickname in config[a_tag]:
+                urls_from_file.append(config[a_tag][a_nickname])
+    urls_combined = set(urls_from_file + args.url_list)
+    print(urls_combined)
+    # validate urls
+    valid_urls = [an_url for an_url in urls_combined if all([getattr(urlparse(an_url), qualifying_attr) for qualifying_attr in ('scheme', 'netloc')])]
+    valid_urls = [an_url[:-1] if an_url.endswith("/") else an_url for an_url in valid_urls]
     print(f"Kept valid urls : {valid_urls}")
     # reading the changes DB in order to take them in account if we already scanned the url.
     with open(DB_FILEPATH, "r") as readable:
@@ -57,9 +73,9 @@ if __name__ == "__main__":
     with open(DB_FILEPATH, "w+") as open_file:
         changes = json.dump(changes, open_file, indent=4)
 
-    changed_url = change_since_last_time(urls=valid_urls, db_file_path=DB_FILEPATH, start_time=START_PROGRAM_TIME)
+    changed_urls = change_since_last_time(urls=valid_urls, db_file_path=DB_FILEPATH, start_time=START_PROGRAM_TIME)
 
-    print(f"changed url since last time : {changed_url}")
+    print(f"new : {changed_urls}")
     if args.open_url:
-        for an_url in changed_url:
+        for an_url in changed_urls:
             webbrowser.open(an_url, new=1)
