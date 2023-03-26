@@ -8,7 +8,6 @@ some website change everytime => take only the body?
 
 ## to implement
 
-- argparse in order to catch url directly
-- possibility to take multiple urls in args [list]
+
 - make a specific outfile for the user?
 - implement a last_change_only option (w/ argparse) that record only if the last md5 /sha256 is different
