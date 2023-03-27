@@ -50,8 +50,10 @@ if __name__ == "__main__":
         type=file_path,
         help="Specifies a path to a file with a list of browsers in it.",
     )
+
     args = parser.parse_args()
     urls_from_file = []
+
     if args.file is not None:
         config = configparser.ConfigParser()
         config.read(args.file[0])
@@ -62,8 +64,10 @@ if __name__ == "__main__":
         for a_tag in config.sections():
             for a_nickname in config[a_tag]:
                 urls_from_file.append(config[a_tag][a_nickname])
+
     urls_combined = set(urls_from_file + args.url_list)
-    print(urls_combined)
+    print(f"{urls_combined = }")
+
     # validate urls
     valid_urls = [
         an_url
@@ -75,11 +79,14 @@ if __name__ == "__main__":
             ]
         )
     ]
+
     valid_urls = [
         an_url[:-1] if an_url.endswith("/") else an_url for an_url in valid_urls
     ]
-    print(f"Kept valid urls : {valid_urls}")
-    # reading the changes DB in order to take them in account if we already scanned the url.
+    print(f"{valid_urls = }")
+
+    # reading the changes DB in order to take them in account if we already
+    # scanned the url.
     with open(DB_FILEPATH, "r") as readable:
         changes = json.load(readable)
 
@@ -92,7 +99,7 @@ if __name__ == "__main__":
         md5_res = hashlib.md5(content)
         sha256_res = hashlib.sha256(content)
         current_time = time.time()
-        # so the format inside the json is {url->{_time->(md5,sha256)}}
+        # Format inside the JSON: {url->{_time->(md5,sha256)}}
         if url not in changes:
             changes[url] = {}
 
@@ -106,11 +113,9 @@ if __name__ == "__main__":
     with open(DB_FILEPATH, "w+") as open_file:
         changes = json.dump(changes, open_file, indent=4)
 
-    changed_urls = change_since_last_time(
-        urls=valid_urls, db_file_path=DB_FILEPATH, start_time=START_PROGRAM_TIME
-    )
+    changed_urls = change_since_last_time(valid_urls, DB_FILEPATH, START_PROGRAM_TIME)
 
-    print(f"new : {changed_urls}")
+    print(f"{changed_urls = }")
     if args.open_url:
         for an_url in changed_urls:
             webbrowser.open(an_url, new=1)
