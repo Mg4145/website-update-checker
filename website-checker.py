@@ -143,7 +143,10 @@ if __name__ == "__main__":
             changes[url] = {}
         elif args.changed_only:
             last_time = list(changes[url].keys())[-1]
-            if changes[url][last_time] == {"md5": md5_res.hexdigest(), "sha256": sha256_res.hexdigest(),}:
+            if changes[url][last_time] == {
+                "md5": md5_res.hexdigest(),
+                "sha256": sha256_res.hexdigest(),
+            }:
                 continue
 
         # changes[url].append(current_time)
