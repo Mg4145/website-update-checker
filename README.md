@@ -33,10 +33,8 @@ website-checker.py --file path_to_the_file
 
 ## Problems
 
-- Some website change everytime (Google for example) => take only the body?
+- Some website change everytime (Github main page for example)
 
 ## Implement
 
 - make a specific outfile for the user?
-- implement a last_change_only option (w/ argparse) that record only if the
-  last md5 /sha256 is different
