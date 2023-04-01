@@ -8,7 +8,12 @@ from urllib.parse import urlparse
 import argparse
 import webbrowser
 import configparser
+from datetime import datetime
 
+# third party
+from bs4 import BeautifulSoup
+
+# Locals
 from src.funct import change_since_last_time, file_path
 
 
@@ -50,6 +55,8 @@ if __name__ == "__main__":
         type=file_path,
         help="Specifies a path to a file with a list of browsers in it.",
     )
+    parser.add_argument("-b","--body_only", default=True, action="store_false", help="Default to True. If used the hashes will be created with the whole page.")
+    parser.add_argument("-d","--dump_traces", default=False, action="store_true", help="Default to False. If used creates a file with the content extracted.")
 
     args = parser.parse_args()
     urls_from_file = []
@@ -94,8 +101,15 @@ if __name__ == "__main__":
         if url.endswith("/"):
             url = url[:-1]
         # request url
-        content = urlopen(url=url).read()
-
+        content = str(urlopen(url=url).read())
+        content = BeautifulSoup(content, features="html.parser")
+        if args.body_only:
+            content = content.body
+        content = content.strings
+        content = "".join(content).encode("utf-8")
+        if args.dump_traces:
+            with open(os.path.join(os.path.dirname(DB_FILEPATH),f"{datetime.now().strftime('%Y%m%d')}_{urlparse(url).netloc}.txt"), "w+") as trace_file:
+                trace_file.writelines(content.decode())
         md5_res = hashlib.md5(content)
         sha256_res = hashlib.sha256(content)
         current_time = time.time()
