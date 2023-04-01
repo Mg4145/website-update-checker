@@ -63,6 +63,13 @@ if __name__ == "__main__":
         help="Default to True. If used the hashes will be created with the whole page.",
     )
     parser.add_argument(
+        "-c",
+        "--changed_only",
+        default=True,
+        action="store_false",
+        help="Default to True. Doesn't store the new value if the hashes are identical from the previous ones.",
+    )
+    parser.add_argument(
         "-d",
         "--dump_traces",
         default=False,
@@ -134,6 +141,10 @@ if __name__ == "__main__":
         # Format inside the JSON: {url->{_time->(md5,sha256)}}
         if url not in changes:
             changes[url] = {}
+        elif args.changed_only:
+            last_time = list(changes[url].keys())[-1]
+            if changes[url][last_time] == {"md5": md5_res.hexdigest(), "sha256": sha256_res.hexdigest(),}:
+                continue
 
         # changes[url].append(current_time)
         changes[url][current_time] = {
