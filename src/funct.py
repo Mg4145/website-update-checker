@@ -11,10 +11,9 @@ def file_path(path: str):
         raise argparse.ArgumentTypeError(f"readable_file:{path} is not a valid path")
 
 
-def change_since_last_time (
+def change_since_last_time(
     urls: list, db_file_path: str, start_time: time.time()
 ) -> list:
-
     website_updated = []
     with open(db_file_path, "r") as open_file:
         changes = json.load(open_file)
